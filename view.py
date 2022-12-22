@@ -9,12 +9,13 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from pytube import YouTube
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(450, 200)
+        MainWindow.resize(550, 200)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("../free-icon-youtube-889241.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -29,10 +30,14 @@ class Ui_MainWindow(object):
         self.label.setFont(font)
         self.label.setObjectName("label")
         self.le_video_url = QtWidgets.QLineEdit(self.centralwidget)
-        self.le_video_url.setGeometry(QtCore.QRect(70, 10, 375, 20))
+        self.le_video_url.setGeometry(QtCore.QRect(75, 10, 375, 20))
         self.le_video_url.setObjectName("le_video_url")
+        self.btn_check_url = QtWidgets.QPushButton(self.centralwidget)
+        self.btn_check_url.setGeometry(QtCore.QRect(455, 10, 75, 20))
+        self.btn_check_url.setStyleSheet("background-color: rgb(170, 255, 255);")
+        self.btn_check_url.setObjectName("btn_check_url")
         self.btn_download = QtWidgets.QPushButton(self.centralwidget)
-        self.btn_download.setGeometry(QtCore.QRect(370, 40, 75, 23))
+        self.btn_download.setGeometry(QtCore.QRect(370, 40, 75, 20))
         self.btn_download.setStyleSheet("background-color: rgb(170, 255, 255);")
         self.btn_download.setObjectName("btn_download")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
@@ -42,7 +47,7 @@ class Ui_MainWindow(object):
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.cb_resolution = QtWidgets.QComboBox(self.centralwidget)
-        self.cb_resolution.setGeometry(QtCore.QRect(70, 50, 151, 22))
+        self.cb_resolution.setGeometry(QtCore.QRect(75, 50, 151, 20))
         self.cb_resolution.setObjectName("cb_resolution")
         self.cb_resolution.addItem("")
         self.cb_resolution.addItem("")
@@ -50,15 +55,18 @@ class Ui_MainWindow(object):
         self.cb_resolution.addItem("")
         self.cb_resolution.addItem("")
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
-        self.label_3.setGeometry(QtCore.QRect(12, 92, 47, 13))
+        self.label_3.setGeometry(QtCore.QRect(12, 90, 47, 20))
         font = QtGui.QFont()
         font.setItalic(True)
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
         self.tb_btn_save = QtWidgets.QToolButton(self.centralwidget)
-        self.tb_btn_save.setGeometry(QtCore.QRect(69, 90, 25, 19))
+        self.tb_btn_save.setGeometry(QtCore.QRect(69, 90, 25, 20))
         self.tb_btn_save.setStyleSheet("background-color: rgb(170, 255, 255);")
         self.tb_btn_save.setObjectName("tb_btn_save")
+        self.pb_dwnld_progress = QtWidgets.QProgressBar(self.centralwidget)
+        self.pb_dwnld_progress.setGeometry(QtCore.QRect(30, 150, 530, 20))
+        self.pb_dwnld_progress.setObjectName("pb_download_progress")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -69,6 +77,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "Youtube downloader"))
         self.label.setText(_translate("MainWindow", "Video URL:"))
         self.btn_download.setText(_translate("MainWindow", "Download"))
+        self.btn_check_url.setText(_translate("MainWindow", "Check URL"))
         self.label_2.setText(_translate("MainWindow", "Resolution:"))
         self.cb_resolution.setItemText(0, _translate("MainWindow", "360p"))
         self.cb_resolution.setItemText(1, _translate("MainWindow", "480p"))
@@ -79,4 +88,27 @@ class Ui_MainWindow(object):
         self.tb_btn_save.setText(_translate("MainWindow", "..."))
 
 
+    def get_video_url(self)->str:
+        return self.le_video_url.text()
 
+
+    def check_url(self):
+        yt = YouTube(Ui_MainWindow.get_video_url())
+        yt.check_availability()
+
+
+
+    def get_saveto_path(self)->str:
+
+
+
+    def download(self):
+        yt = YouTube(Ui_MainWindow.get_video_url())
+        if self.cb_resolution.currentIndex() != 4:
+            yt.streams.filter(file_extension='mp4')
+            stream = yt.streams.get_by_resolution(self.cb_resolution.currentText())
+            stream.download()
+        else:
+            yt.streams.filter(only_audio=True)
+            stream = yt.streams.get_audio_only()
+            stream.download()
