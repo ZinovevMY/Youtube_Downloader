@@ -60,8 +60,10 @@ class Ui_MainWindow(object):
         font.setItalic(True)
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
+        self.le_save_path_text = QtWidgets.QLineEdit(self.centralwidget)
+        self.le_save_path_text.setGeometry(QtCore.QRect(75, 90, 390, 20))
         self.tb_btn_save = QtWidgets.QToolButton(self.centralwidget)
-        self.tb_btn_save.setGeometry(QtCore.QRect(69, 90, 25, 20))
+        self.tb_btn_save.setGeometry(QtCore.QRect(469, 90, 25, 20))
         self.tb_btn_save.setStyleSheet("background-color: rgb(170, 255, 255);")
         self.tb_btn_save.setObjectName("tb_btn_save")
         self.pb_dwnld_progress = QtWidgets.QProgressBar(self.centralwidget)
@@ -87,26 +89,22 @@ class Ui_MainWindow(object):
         self.label_3.setText(_translate("MainWindow", "Save as:"))
         self.tb_btn_save.setText(_translate("MainWindow", "..."))
 
-
-    def get_video_url(self)->str:
+    def get_video_url(self) -> str:
         return self.le_video_url.text()
-
 
     def check_url(self):
         yt = YouTube(Ui_MainWindow.get_video_url())
         yt.check_availability()
 
-
-
-    def get_saveto_path(self)->str:
-
-
+    def get_saveto_path(self, youtube) -> str:
+        pass
 
     def download(self):
-        yt = YouTube(Ui_MainWindow.get_video_url())
+        yt = YouTube(Ui_MainWindow.get_video_url(self))
         if self.cb_resolution.currentIndex() != 4:
             yt.streams.filter(file_extension='mp4')
             stream = yt.streams.get_by_resolution(self.cb_resolution.currentText())
+
             stream.download()
         else:
             yt.streams.filter(only_audio=True)
