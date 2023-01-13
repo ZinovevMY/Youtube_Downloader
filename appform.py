@@ -1,10 +1,14 @@
 import wx
 import wx.xrc
+import youtube_dl
+from pytube import YouTube
+from pytube import Stream
 
 
 ###########################################################################
 # Class MainFrame
 ###########################################################################
+
 
 class MainFrame(wx.Frame):
 
@@ -28,8 +32,8 @@ class MainFrame(wx.Frame):
 
         url.Add(self.m_staticText1, 0, wx.ALL, 8)
 
-        self.m_textCtrl1 = wx.TextCtrl(self.panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(375, 25), 0)
-        url.Add(self.m_textCtrl1, 0, wx.ALL, 5)
+        self.video_url = wx.TextCtrl(self.panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(375, 25), 0)
+        url.Add(self.video_url, 0, wx.ALL, 5)
 
         self.chckvideo_btn = wx.Button(self.panel, wx.ID_ANY, u"Проверить видео", wx.DefaultPosition, wx.Size(150, 25),
                                        0)
@@ -46,8 +50,8 @@ class MainFrame(wx.Frame):
 
         info1.Add(self.m_staticText3, 0, wx.ALL, 5)
 
-        self.m_textCtrl3 = wx.TextCtrl(self.panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(600, 25), 0)
-        info1.Add(self.m_textCtrl3, 0, wx.ALL, 5)
+        self.video_title = wx.TextCtrl(self.panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(600, 25), 0)
+        info1.Add(self.video_title, 0, wx.ALL, 5)
 
         vbox.Add(info1, 1, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
 
@@ -57,9 +61,9 @@ class MainFrame(wx.Frame):
                                              wx.Size(250, 150), 0)
         descr.Add(self.preview_image, 0, wx.ALL, 5)
 
-        self.m_textCtrl4 = wx.TextCtrl(self.panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(350, 150),
+        self.video_descr = wx.TextCtrl(self.panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(350, 150),
                                        wx.TE_MULTILINE | wx.TE_READONLY)
-        descr.Add(self.m_textCtrl4, 0, wx.ALL, 5)
+        descr.Add(self.video_descr, 0, wx.ALL, 5)
 
         vbox.Add(descr, 1, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
 
@@ -71,8 +75,8 @@ class MainFrame(wx.Frame):
 
         save.Add(self.m_staticText5, 0, wx.ALIGN_BOTTOM | wx.ALL, 5)
 
-        self.m_textCtrl5 = wx.TextCtrl(self.panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(375, 25), 0)
-        save.Add(self.m_textCtrl5, 0, wx.ALL, 5)
+        self.savepath = wx.TextCtrl(self.panel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(375, 25), 0)
+        save.Add(self.savepath, 0, wx.ALL, 5)
 
         self.savepath_btn = wx.Button(self.panel, wx.ID_ANY, u"Выбрать", wx.DefaultPosition, wx.Size(150, 25), 0)
         save.Add(self.savepath_btn, 0, wx.ALL, 5)
@@ -84,9 +88,9 @@ class MainFrame(wx.Frame):
         self.save_btn = wx.Button(self.panel, wx.ID_ANY, u"Сохранить", wx.DefaultPosition, wx.Size(125, 25), 0)
         status.Add(self.save_btn, 0, wx.ALL, 5)
 
-        self.m_gauge1 = wx.Gauge(self.panel, wx.ID_ANY, 100, wx.DefaultPosition, wx.Size(350, 25), wx.GA_HORIZONTAL)
-        self.m_gauge1.SetValue(0)
-        status.Add(self.m_gauge1, 0, wx.ALL, 5)
+        self.progress = wx.Gauge(self.panel, wx.ID_ANY, 100, wx.DefaultPosition, wx.Size(350, 25), wx.GA_HORIZONTAL)
+        self.progress.SetValue(0)
+        status.Add(self.progress, 0, wx.ALL, 5)
 
         self.m_staticText4 = wx.StaticText(self.panel, wx.ID_ANY, u"Завершено", wx.DefaultPosition, wx.Size(-1, 25), 0)
         self.m_staticText4.Wrap(-1)
@@ -105,20 +109,27 @@ class MainFrame(wx.Frame):
         self.Centre(wx.BOTH)
 
         # Connect Events
-        self.chckvideo_btn.Bind(wx.EVT_BUTTON, self.checkvideo_click)
-        self.savepath_btn.Bind(wx.EVT_BUTTON, self.saveas_click)
-        self.save_btn.Bind(wx.EVT_BUTTON, self.download_click)
+        self.chckvideo_btn.Bind(wx.EVT_BUTTON, self.checkvideo_click, id=self.chckvideo_btn.GetId())
+        self.savepath_btn.Bind(wx.EVT_BUTTON, self.saveas_click, id=self.savepath_btn.GetId())
+        self.save_btn.Bind(wx.EVT_BUTTON, self.download_click, id=self.save_btn.GetId())
         self.Show()
 
     def __del__(self):
         pass
 
-    # Virtual event handlers, override them in your derived class
+    # event handlers
     def checkvideo_click(self, event):
-        event.Skip()
+        url = self.video_url.GetValue()
+        if url.startswith(('https://youtu.be', 'https://youtube.com')):
+            yt = YouTube(url)
+            self.video_title.SetValue(yt.title)
+            self.preview_image.SetBitmap(yt.thumbnail_url)
+            print("Нажали кнопку проверки")
+        else:
+            self.video_title.Label = "Неверный адрес видео!"
 
     def saveas_click(self, event):
-        event.Skip()
+        print("Нажали кнопку выбора папки")
 
     def download_click(self, event):
-        event.Skip()
+        print("Нажали кнопку загрузки")
