@@ -9,8 +9,10 @@ import wx.xrc
 class MainFrame(wx.Frame):
 
     def __init__(self, parent):
+        no_resize = wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |
+                                                wx.MAXIMIZE_BOX | wx.TAB_TRAVERSAL)
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=u"Youtube downloader", pos=wx.DefaultPosition,
-                          size=wx.Size(650, 400), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
+                          size=wx.Size(650, 400), style=no_resize)
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
 
@@ -106,6 +108,7 @@ class MainFrame(wx.Frame):
         self.chckvideo_btn.Bind(wx.EVT_BUTTON, self.checkvideo_click)
         self.savepath_btn.Bind(wx.EVT_BUTTON, self.saveas_click)
         self.save_btn.Bind(wx.EVT_BUTTON, self.download_click)
+        self.Show()
 
     def __del__(self):
         pass
